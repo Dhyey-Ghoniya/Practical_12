@@ -6,29 +6,32 @@ const app = require('../src/app');
 let server;
 let baseUrl;
 
-test.before((done) => {
-  server = http.createServer(app);
-  server.listen(0, () => {
-    const port = server.address().port;
-    baseUrl = `http://localhost:${port}`;
-    done();
+test.before(async () => {
+  await new Promise((resolve) => {
+    server = http.createServer(app);
+    server.listen(0, () => {
+      const port = server.address().port;
+      baseUrl = `http://localhost:${port}`;
+      resolve();
+    });
   });
 });
 
-test.after((done) => {
-  server.close(done);
+test.after(async () => {
+  await new Promise((resolve) => server.close(resolve));
 });
 
-test('🧪 TEST 1: GET /api/tasks returns HTTP 200 and task list', async () => {
+test('🧪 TEST 1: GET /api/tasks returns HTTP 200 and task array', async () => {
   const res = await fetch(`${baseUrl}/api/tasks`);
   assert.strictEqual(res.status, 200, 'Expected status code 200');
   const body = await res.json();
   assert.strictEqual(body.success, true);
   assert.ok(Array.isArray(body.tasks), 'tasks should be an array');
+  assert.ok(body.tasks.length >= 1, 'tasks should contain seeded records');
 });
 
-test('🧪 TEST 2: POST /api/tasks creates task with HTTP 201', async () => {
-  const payload = { title: 'CI Pipeline Automated Verification Task', priority: 'High' };
+test('🧪 TEST 2: POST /api/tasks creates task with HTTP 201 Created', async () => {
+  const payload = { title: 'Automated GitHub Actions Verification Task', priority: 'Critical' };
   const res = await fetch(`${baseUrl}/api/tasks`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
@@ -39,6 +42,7 @@ test('🧪 TEST 2: POST /api/tasks creates task with HTTP 201', async () => {
   const body = await res.json();
   assert.strictEqual(body.success, true);
   assert.strictEqual(body.task.title, payload.title);
+  assert.strictEqual(body.task.priority, payload.priority);
 });
 
 test('🧪 TEST 3: POST /api/tasks with empty title returns HTTP 400 Bad Request', async () => {
