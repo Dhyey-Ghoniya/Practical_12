@@ -1,0 +1,14 @@
+{
+  "name": "practical-12-cicd-github-actions",
+  "version": "1.0.0",
+  "description": "ITUE301 AWDF Practical 12: CI/CD Pipeline with GitHub Actions",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "test": "node --test tests/task.test.js"
+  },
+  "dependencies": {
+    "cors": "^2.8.5",
+    "express": "^4.19.2"
+  }
+}
